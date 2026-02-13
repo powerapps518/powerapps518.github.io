@@ -638,10 +638,29 @@ const supabase = window.supabase.createClient(
         let updateIntervals = [];
 
         // Initialize
-        (async () => {
-  await loadData();
-  updateUI();
-})();
+async function loadData() {
+
+    const { data: stateRow, error: stateError } = await supabase
+        .from('app_state')
+        .select('*')
+        .eq('id','main')
+        .maybeSingle();
+
+    if (!stateError && stateRow) {
+        currentShift = stateRow.data?.currentShift || null;
+        currentDelay = stateRow.data?.currentDelay || null;
+    }
+
+    const { data: shifts, error: shiftsError } = await supabase
+        .from('shifts')
+        .select('*')
+        .order('created_at', { ascending:false });
+
+    if (!shiftsError && shifts) {
+        shiftHistory = shifts.map(s => s.data);
+    }
+}
+
 
         updateDateTime();
         setInterval(updateDateTime, 1000);
