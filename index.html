@@ -622,41 +622,70 @@
             </div>
         </div>
     </div>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+	const SUPABASE_URL = "https://cjctuhowfhmyazngnrph.supabase.co";
+const SUPABASE_KEY = "EyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqY3R1aG93ZmhteWF6bmducnBoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5OTg3NzMsImV4cCI6MjA4NjU3NDc3M30.s3Iapthvnxcc1K99N4P6neM3WvVtz6mVDgPIZAaalFA";
+
+const supabase = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
         let currentShift = null;
         let currentDelay = null;
         let shiftHistory = [];
         let updateIntervals = [];
 
         // Initialize
-        loadData();
+        (async () => {
+  await loadData();
+  updateUI();
+})();
+
         updateDateTime();
         setInterval(updateDateTime, 1000);
-        updateUI();
 
         // Load data from localStorage
-        function loadData() {
-            const savedShift = localStorage.getItem('currentShift');
-            const savedHistory = localStorage.getItem('shiftHistory');
-            
-            if (savedShift) {
-                currentShift = JSON.parse(savedShift);
-            }
-            if (savedHistory) {
-                shiftHistory = JSON.parse(savedHistory);
-            }
-        }
+        // Load data from localStorage
+async function loadData() {
+
+    const { data: stateRow } = await supabase
+        .from('app_state')
+        .select('*')
+        .eq('id','main')
+        .maybeSingle();
+
+    if (stateRow) {
+        currentShift = stateRow.data.currentShift;
+        currentDelay = stateRow.data.currentDelay;
+    }
+
+    const { data: shifts } = await supabase
+        .from('shifts')
+        .select('*')
+        .order('created_at', { ascending:false });
+
+    shiftHistory = shifts ? shifts.map(s => s.data) : [];
+}
+
+
 
         // Save data to localStorage
-        function saveData() {
-            if (currentShift) {
-                localStorage.setItem('currentShift', JSON.stringify(currentShift));
-            } else {
-                localStorage.removeItem('currentShift');
+        async function saveData() {
+    await supabase
+        .from('app_state')
+        .upsert({
+            id: 'main',
+            data: {
+                currentShift,
+                currentDelay
             }
-            localStorage.setItem('shiftHistory', JSON.stringify(shiftHistory));
-        }
+        });
+
+    showAutoSave();
+}
+
 
         // Update date/time display
         function updateDateTime() {
@@ -967,7 +996,7 @@
         });
 
         // End shift function
-        function endShiftNow(keepDelayActive) {
+        async function endShiftNow(keepDelayActive) {
             const station1 = document.getElementById('stopStationNum1').value.trim();
             const station2 = document.getElementById('stopStationNum2').value.trim();
             const stopStation = station1 + '+' + station2;
@@ -999,6 +1028,10 @@
             }
             
             shiftHistory.unshift(currentShift);
+			await supabase
+  .from('shifts')
+  .insert({ data: currentShift });
+
             
             // Auto-export when shift ends
             autoExportShift(currentShift);
@@ -1211,13 +1244,7 @@
             }, 2000);
         }
 
-        // Enhanced save with auto-save indicator
-        const originalSaveData = saveData;
-        saveData = function() {
-            originalSaveData();
-            showAutoSave();
-        };
-
+        
         // Auto-save every 30 seconds (redundant safety)
         setInterval(() => {
             if (currentShift || shiftHistory.length > 0) {
