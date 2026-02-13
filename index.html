@@ -4,23 +4,492 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Leverman Logger</title>
-
-    <!-- Supabase client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <style>
-        /* ────────────────────────────────────────────────
-           Your original CSS remains completely unchanged
-        ──────────────────────────────────────────────── */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; min-height: 100vh; }
-        /* ... rest of your CSS unchanged ... */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: #2196F3;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .tab-navigation {
+            display: flex;
+            background: #1976D2;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            background: #1976D2;
+            color: white;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .tab.active {
+            background: white;
+            color: #2196F3;
+        }
+
+        .tab:hover:not(.active) {
+            background: #1565C0;
+        }
+
+        .screen {
+            display: none;
+            padding: 30px;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .form-section {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #2196F3;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+
+        button {
+            padding: 16px 24px;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: #2196F3;
+            color: white;
+            width: 100%;
+            padding: 18px;
+            font-size: 18px;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #1976D2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-start {
+            background: #f44336;
+            color: white;
+            width: 100%;
+            padding: 20px;
+            font-size: 20px;
+            margin: 20px 0;
+        }
+
+        .btn-start:hover:not(:disabled) {
+            background: #d32f2f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
+        }
+
+        .btn-start:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-end {
+            background: #4CAF50;
+            color: white;
+            width: 100%;
+            padding: 20px;
+            font-size: 20px;
+            margin: 20px 0;
+        }
+
+        .btn-end:hover:not(:disabled) {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-end:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-reason {
+            background: white;
+            color: #333;
+            border: 2px solid #ddd;
+            padding: 16px 20px;
+            margin: 8px 0;
+            width: 100%;
+        }
+
+        .btn-reason:hover {
+            border-color: #2196F3;
+            background: #e3f2fd;
+        }
+
+        .btn-reason.selected {
+            background: #2196F3;
+            color: white;
+            border-color: #2196F3;
+        }
+
+        .status-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .status-box h3 {
+            color: #2196F3;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .status-box p {
+            margin: 5px 0;
+            color: #555;
+            font-size: 15px;
+        }
+
+        .status-box strong {
+            color: #333;
+        }
+
+        .alert {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            color: #856404;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            border-left-color: #f44336;
+            color: #721c24;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border-left-color: #4CAF50;
+            color: #155724;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .delay-log-entry {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 3px solid #2196F3;
+        }
+
+        .delay-log-entry p {
+            margin: 3px 0;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .delay-log-entry strong {
+            color: #333;
+        }
+
+        .current-delay-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .current-delay-box h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .history-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #eee;
+        }
+
+        .history-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .auto-save-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #4CAF50;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .auto-save-indicator.show {
+            opacity: 1;
+        }
+
+        .shift-history-entry {
+            background: #f0f9f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .shift-history-entry h4 {
+            color: #4CAF50;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .shift-history-entry p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .delays-in-shift {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+        }
+
+        .delays-in-shift h5 {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        /* Mobile responsive styles */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        button {
+            touch-action: manipulation;
+        }
+
+        body,
+        .container {
+            overflow-x: hidden;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 10px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+                margin-bottom: 5px;
+            }
+
+            .header p {
+                font-size: 12px;
+            }
+
+            .tab {
+                font-size: 13px;
+                padding: 12px 6px;
+            }
+
+            .screen {
+                padding: 15px 12px;
+            }
+
+            .form-section {
+                margin-bottom: 18px;
+            }
+
+            label {
+                font-size: 13px;
+            }
+
+            input[type="text"],
+            input[type="number"],
+            textarea {
+                padding: 13px 10px;
+                font-size: 16px;
+            }
+
+            button {
+                font-size: 15px;
+                padding: 15px 18px;
+            }
+
+            .btn-primary {
+                font-size: 16px;
+                padding: 16px;
+            }
+
+            .btn-start,
+            .btn-end {
+                font-size: 17px;
+                padding: 17px;
+                margin: 12px 0;
+            }
+
+            .btn-reason {
+                font-size: 14px;
+                padding: 14px 16px;
+            }
+
+            .status-box,
+            .current-delay-box,
+            .alert,
+            .shift-history-entry {
+                padding: 14px;
+                margin: 12px 0;
+            }
+
+            .status-box h3,
+            .current-delay-box h3 {
+                font-size: 16px;
+            }
+
+            .status-box p,
+            .current-delay-box p,
+            .shift-history-entry p {
+                font-size: 13px;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+
+            .shift-history-entry h4 {
+                font-size: 15px;
+            }
+
+            .auto-save-indicator {
+                font-size: 11px;
+                padding: 6px 12px;
+                top: 8px;
+                right: 8px;
+            }
+        }
+
+        @media (max-width: 375px) {
+            .header h1 {
+                font-size: 18px;
+            }
+
+            .header p {
+                font-size: 11px;
+            }
+
+            .tab {
+                font-size: 12px;
+                padding: 10px 4px;
+            }
+
+            .screen {
+                padding: 12px 10px;
+            }
+
+            input[type="text"],
+            input[type="number"],
+            textarea {
+                padding: 12px 8px;
+            }
+
+            .btn-reason {
+                font-size: 13px;
+                padding: 13px 14px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="auto-save-indicator" id="autoSaveIndicator">✓ Auto-saved</div>
     <div class="container">
-        <!-- Your HTML structure remains 99% unchanged -->
         <div class="header">
             <h1>⚓ Leverman Logger</h1>
             <p id="currentDateTime"></p>
@@ -32,258 +501,729 @@
             <button class="tab" onclick="showScreen('history')">History</button>
         </div>
 
-        <!-- SHIFT SCREEN, DELAY SCREEN, HISTORY SCREEN, MODAL → unchanged -->
+        <!-- SHIFT SCREEN -->
+        <div id="shiftScreen" class="screen active">
+            <div id="noActiveShift">
+                <h2 style="margin-bottom: 20px; color: #333;">Start Your Shift</h2>
+                
+                <div class="form-section">
+                    <label>Leverman Name</label>
+                    <input type="text" id="levermanName" placeholder="Enter your name">
+                </div>
 
-        <!-- ... paste your original screen HTML here (shiftScreen, delayScreen, historyScreen, delayWarningModal) ... -->
-        <!-- For brevity I'm not repeating it – keep your original markup -->
+                <div class="form-section">
+                    <label>Start Station</label>
+                    <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
+                        <input type="number" id="startStationNum1" placeholder="1238" style="flex: 1; min-width: 0; padding: 12px 8px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;" min="0">
+                        <span style="font-size: 20px; font-weight: bold; color: #333; flex-shrink: 0;">+</span>
+                        <input type="number" id="startStationNum2" placeholder="10" style="flex: 1; min-width: 0; padding: 12px 8px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;" min="0">
+                    </div>
+                </div>
 
+                <button class="btn-primary" id="startShiftBtn" disabled>START SHIFT</button>
+            </div>
+
+            <div id="activeShift" class="hidden">
+                <div class="status-box">
+                    <h3>🟢 Active Shift</h3>
+                    <p><strong>Leverman:</strong> <span id="activeShiftName"></span></p>
+                    <p><strong>Start Time:</strong> <span id="activeShiftStartTime"></span></p>
+                    <p><strong>Start Station:</strong> <span id="activeShiftStartStation"></span></p>
+                    <p><strong>Duration:</strong> <span id="shiftDuration"></span></p>
+                </div>
+
+                <div class="form-section">
+                    <label>Stop Station</label>
+                    <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
+                        <input type="number" id="stopStationNum1" placeholder="950" style="flex: 1; min-width: 0; padding: 12px 8px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;" min="0">
+                        <span style="font-size: 20px; font-weight: bold; color: #333; flex-shrink: 0;">+</span>
+                        <input type="number" id="stopStationNum2" placeholder="33" style="flex: 1; min-width: 0; padding: 12px 8px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;" min="0">
+                    </div>
+                </div>
+
+                <button class="btn-end" id="endShiftBtn" disabled>END SHIFT</button>
+            </div>
+
+            <div id="previousShiftSection" class="hidden" style="margin-top: 40px; padding-top: 30px; border-top: 2px solid #eee;">
+                <h3 style="color: #333; margin-bottom: 15px;">Previous Shift</h3>
+                <div id="previousShiftContainer"></div>
+            </div>
+        </div>
+
+        <!-- DELAY SCREEN -->
+        <div id="delayScreen" class="screen">
+            <div id="noActiveShiftWarning" class="alert alert-danger">
+                ⚠️ No active shift. Please start a shift on the Shift Screen first.
+            </div>
+
+            <div id="delayInterface" class="hidden">
+                <div class="status-box">
+                    <h3>Current Shift</h3>
+                    <p><strong>Leverman:</strong> <span id="delayShiftName"></span></p>
+                    <p><strong>Start of Shift:</strong> <span id="delayShiftStart"></span></p>
+                </div>
+
+                <div id="noActiveDelay">
+                    <button class="btn-start" id="startDelayBtn">START OF DELAY</button>
+                </div>
+
+                <div id="activeDelay" class="hidden">
+                    <div id="reasonSelectionSection">
+                        <div class="form-section">
+                            <label>Reason for Delay</label>
+                            <button class="btn-reason" data-reason="Vessel Traffic">VESSEL TRAFFIC</button>
+                            <button class="btn-reason" data-reason="Pump Problem">PUMP PROBLEM</button>
+                            <button class="btn-reason" data-reason="Engine Problem">ENGINE PROBLEM</button>
+                            <button class="btn-reason" data-reason="Other">ADD REASON</button>
+                        </div>
+
+                        <div class="form-section hidden" id="customReasonSection">
+                            <label>Custom Reason</label>
+                            <textarea id="customReason" placeholder="Enter custom reason..."></textarea>
+                        </div>
+
+                        <button class="btn-primary hidden" id="saveReasonBtn" style="margin-top: 10px;">SAVE REASON</button>
+                    </div>
+
+                    <div id="delayInProgressSection" class="hidden">
+                        <div class="current-delay-box">
+                            <h3>⏱️ Delay In Progress</h3>
+                            <p><strong>Start Time:</strong> <span id="delayStartTime"></span></p>
+                            <p><strong>Duration:</strong> <span id="delayDuration"></span></p>
+                            <p><strong>Reason for Delay:</strong> <span id="delayReasonDisplay"></span></p>
+                        </div>
+
+                        <button class="btn-end" id="endDelayBtn">END OF DELAY</button>
+                    </div>
+                </div>
+
+                <div id="delaySuccessMsg" class="alert alert-success hidden">
+                    ✓ Delay logged successfully!
+                </div>
+            </div>
+        </div>
+
+        <!-- HISTORY SCREEN -->
+        <div id="historyScreen" class="screen">
+            <h2 style="margin-bottom: 20px; color: #333;">Shift History</h2>
+            <div id="historyContainer"></div>
+            <div id="noHistory" class="alert" style="display: none;">
+                No shift history available.
+            </div>
+        </div>
+
+        <!-- Delay Warning Modal -->
+        <div id="delayWarningModal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px;">
+            <div style="background: white; padding: 25px; border-radius: 12px; max-width: 500px; width: 100%;">
+                <h3 style="color: #f44336; margin-bottom: 15px; font-size: 18px;">⚠️ Active Delay Warning</h3>
+                <p style="margin-bottom: 20px; color: #555; font-size: 14px;">You have an ongoing delay. What would you like to do?</p>
+                <button class="btn-primary" id="continueDelayBtn" style="margin-bottom: 10px; background: #ff9800;">DELAY IS ONGOING</button>
+                <button class="btn-primary" id="endDelayNowBtn" style="background: #f44336;">I WANT TO END THE DELAY</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // ────────────────────────────────────────────────
-        //  Supabase Config – REPLACE THESE TWO LINES
-        // ────────────────────────────────────────────────
-        const SUPABASE_URL    = 'https://cjctuhowfhmyazngnrph.supabase.co';
-        const SUPABASE_ANON_KEY = 'EyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqY3R1aG93ZmhteWF6bmducnBoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5OTg3NzMsImV4cCI6MjA4NjU3NDc3M30.s3Iapthvnxcc1K99N4P6neM3WvVtz6mVDgPIZAaalFA';
-
-        const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        // ────────────────────────────────────────────────
-        //  Globals
-        // ────────────────────────────────────────────────
-        let currentUser     = null;
-        let currentShift    = null;   // now has .id from Supabase
-        let currentDelay    = null;
-        let shiftHistory    = [];
+        let currentShift = null;
+        let currentDelay = null;
+        let shiftHistory = [];
         let updateIntervals = [];
 
-        // ────────────────────────────────────────────────
-        //  Auth + Load on start
-        // ────────────────────────────────────────────────
-        async function init() {
-            // Get or create anonymous session
-            let { data: { session }, error } = await supabase.auth.getSession();
+        // Initialize
+        loadData();
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+        updateUI();
 
-            if (!session) {
-                const res = await supabase.auth.signInAnonymously();
-                if (res.error) {
-                    console.error("Anon auth failed", res.error);
-                    alert("Cannot connect to cloud storage.\nCheck internet and try again.");
-                    return;
-                }
-                session = res.data.session;
+        // Load data from localStorage
+        function loadData() {
+            const savedShift = localStorage.getItem('currentShift');
+            const savedHistory = localStorage.getItem('shiftHistory');
+            
+            if (savedShift) {
+                currentShift = JSON.parse(savedShift);
             }
-
-            currentUser = session.user;
-            console.log("User ID:", currentUser.id);
-
-            await loadData();
-            updateDateTime();
-            setInterval(updateDateTime, 1000);
-            updateUI();
+            if (savedHistory) {
+                shiftHistory = JSON.parse(savedHistory);
+            }
         }
 
-        // ────────────────────────────────────────────────
-        //  Data Layer – Supabase
-        // ────────────────────────────────────────────────
-        async function loadData() {
-            if (!currentUser) return;
-
-            // 1. Try to load active (unfinished) shift
-            let { data: active, error: errActive } = await supabase
-                .from('leverman_shifts')
-                .select('*')
-                .eq('user_id', currentUser.id)
-                .is('end_time', null)
-                .order('created_at', { ascending: false })
-                .limit(1);
-
-            if (errActive) console.error("Load active error", errActive);
-
-            if (active?.length > 0) {
-                currentShift = active[0];
-                // Reconstruct currentDelay if open
-                if (currentShift.delays?.length > 0) {
-                    const lastDelay = currentShift.delays[currentShift.delays.length - 1];
-                    if (!lastDelay.endTime) {
-                        currentDelay = {
-                            startTime: lastDelay.startTime,
-                            reason: lastDelay.reason,
-                            reasonSaved: !!lastDelay.reason
-                        };
-                    }
-                }
-            }
-
-            // 2. Load recent history (last 60 days)
-            const since = new Date(Date.now() - 60*24*60*60*1000).toISOString();
-
-            let { data: history, error: errHist } = await supabase
-                .from('leverman_shifts')
-                .select('*')
-                .eq('user_id', currentUser.id)
-                .not('end_time', 'is', null)
-                .gte('start_time', since)
-                .order('start_time', { ascending: false });
-
-            if (errHist) console.error("Load history error", errHist);
-            shiftHistory = history || [];
-        }
-
-        async function saveCurrentShift() {
-            if (!currentUser || !currentShift) return;
-
-            const payload = {
-                user_id:       currentUser.id,
-                leverman_name: currentShift.name,
-                start_time:    currentShift.startTime,
-                start_station: currentShift.startStation,
-                delays:        currentShift.delays || [],
-                updated_at:    new Date().toISOString(),
-            };
-
-            if (currentShift.endTime)    payload.end_time     = currentShift.endTime;
-            if (currentShift.stopStation) payload.stop_station = currentShift.stopStation;
-
-            let query;
-            if (currentShift.id) {
-                // update
-                query = supabase
-                    .from('leverman_shifts')
-                    .update(payload)
-                    .eq('id', currentShift.id)
-                    .eq('user_id', currentUser.id);
+        // Save data to localStorage
+        function saveData() {
+            if (currentShift) {
+                localStorage.setItem('currentShift', JSON.stringify(currentShift));
             } else {
-                // insert new
-                query = supabase
-                    .from('leverman_shifts')
-                    .insert(payload)
-                    .select()
-                    .single();
+                localStorage.removeItem('currentShift');
             }
-
-            const { data, error } = await query;
-
-            if (error) {
-                console.error("Save failed", error);
-                alert("Could not save to cloud. Check connection.");
-                return;
-            }
-
-            if (!currentShift.id) currentShift.id = data.id;
-
-            showAutoSave();
+            localStorage.setItem('shiftHistory', JSON.stringify(shiftHistory));
         }
 
-        // ────────────────────────────────────────────────
-        //  Your original helper functions (mostly unchanged)
-        // ────────────────────────────────────────────────
+        // Update date/time display
         function updateDateTime() {
             const now = new Date();
             document.getElementById('currentDateTime').textContent = 
                 now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) +
-                ' - ' + now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+                ' - ' + formatTime(now);
         }
 
+        // Format time with date if crossing day boundary
         function formatTime(date) {
-            return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+            return date.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true 
+            });
         }
 
+        // Format time with date
         function formatTimeWithDate(date) {
-            return date.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+            return date.toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
         }
 
+        // Check if two dates are on different days
+        function isDifferentDay(date1, date2) {
+            return date1.toDateString() !== date2.toDateString();
+        }
+
+        // Format duration
         function formatDuration(ms) {
             const totalMinutes = Math.floor(ms / 60000);
             const hours = Math.floor(totalMinutes / 60);
             const minutes = totalMinutes % 60;
-            return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+            
+            if (hours > 0) {
+                return `${hours}h ${minutes}m`;
+            }
+            return `${minutes}m`;
         }
 
-        // showScreen, updateUI, displayHistory, displayPreviousShift → keep your original versions
-        // (they read from currentShift / shiftHistory which now come from Supabase)
+        // Show screen
+        function showScreen(screen) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            
+            if (screen === 'shift') {
+                document.getElementById('shiftScreen').classList.add('active');
+                document.querySelectorAll('.tab')[0].classList.add('active');
+            } else if (screen === 'delay') {
+                document.getElementById('delayScreen').classList.add('active');
+                document.querySelectorAll('.tab')[1].classList.add('active');
+            } else if (screen === 'history') {
+                document.getElementById('historyScreen').classList.add('active');
+                document.querySelectorAll('.tab')[2].classList.add('active');
+                displayHistory();
+            }
+            
+            updateUI();
+        }
 
-        // ────────────────────────────────────────────────
-        //  Event listeners – adapted for Supabase
-        // ────────────────────────────────────────────────
+        // Update UI based on current state
+        function updateUI() {
+            // Clear all intervals
+            updateIntervals.forEach(clearInterval);
+            updateIntervals = [];
 
-        // Start shift
-        document.getElementById('startShiftBtn').addEventListener('click', async () => {
+            // Shift Screen
+            if (currentShift) {
+                document.getElementById('noActiveShift').classList.add('hidden');
+                document.getElementById('activeShift').classList.remove('hidden');
+                
+                document.getElementById('activeShiftName').textContent = currentShift.name;
+                const startTime = new Date(currentShift.startTime);
+                document.getElementById('activeShiftStartTime').textContent = formatTimeWithDate(startTime);
+                document.getElementById('activeShiftStartStation').textContent = currentShift.startStation;
+                
+                // Update shift duration
+                const updateShiftDuration = () => {
+                    const duration = new Date() - new Date(currentShift.startTime);
+                    document.getElementById('shiftDuration').textContent = formatDuration(duration);
+                };
+                updateShiftDuration();
+                updateIntervals.push(setInterval(updateShiftDuration, 1000));
+            } else {
+                document.getElementById('noActiveShift').classList.remove('hidden');
+                document.getElementById('activeShift').classList.add('hidden');
+            }
+
+            // Show previous shift
+            if (shiftHistory.length > 0) {
+                document.getElementById('previousShiftSection').classList.remove('hidden');
+                displayPreviousShift();
+            } else {
+                document.getElementById('previousShiftSection').classList.add('hidden');
+            }
+
+            // Delay Screen
+            if (currentShift) {
+                document.getElementById('noActiveShiftWarning').classList.add('hidden');
+                document.getElementById('delayInterface').classList.remove('hidden');
+                
+                document.getElementById('delayShiftName').textContent = currentShift.name;
+                const shiftStartTime = new Date(currentShift.startTime);
+                document.getElementById('delayShiftStart').textContent = formatTimeWithDate(shiftStartTime);
+                
+                if (currentDelay) {
+                    document.getElementById('noActiveDelay').classList.add('hidden');
+                    document.getElementById('activeDelay').classList.remove('hidden');
+                    
+                    // Check if reason is saved
+                    if (currentDelay.reasonSaved) {
+                        // Show delay in progress section
+                        document.getElementById('reasonSelectionSection').classList.add('hidden');
+                        document.getElementById('delayInProgressSection').classList.remove('hidden');
+                        
+                        const delayStart = new Date(currentDelay.startTime);
+                        document.getElementById('delayStartTime').textContent = formatTimeWithDate(delayStart);
+                        document.getElementById('delayReasonDisplay').textContent = currentDelay.reason;
+                        
+                        // Update delay duration
+                        const updateDelayDuration = () => {
+                            const duration = new Date() - new Date(currentDelay.startTime);
+                            document.getElementById('delayDuration').textContent = formatDuration(duration);
+                        };
+                        updateDelayDuration();
+                        updateIntervals.push(setInterval(updateDelayDuration, 1000));
+                    } else {
+                        // Show reason selection section
+                        document.getElementById('reasonSelectionSection').classList.remove('hidden');
+                        document.getElementById('delayInProgressSection').classList.add('hidden');
+                    }
+                } else {
+                    document.getElementById('noActiveDelay').classList.remove('hidden');
+                    document.getElementById('activeDelay').classList.add('hidden');
+                    document.getElementById('delaySuccessMsg').classList.add('hidden');
+                }
+            } else {
+                document.getElementById('noActiveShiftWarning').classList.remove('hidden');
+                document.getElementById('delayInterface').classList.add('hidden');
+            }
+        }
+
+        // Display previous shift only
+        function displayPreviousShift() {
+            const container = document.getElementById('previousShiftContainer');
+            const shift = shiftHistory[0]; // Most recent shift
+            
+            const startTime = new Date(shift.startTime);
+            const endTime = new Date(shift.endTime);
+            const duration = (endTime - startTime) / 60000;
+            
+            let html = `
+                <div class="shift-history-entry">
+                    <h4>${shift.name} - ${startTime.toLocaleDateString()}</h4>
+                    <p><strong>Start:</strong> ${formatTimeWithDate(startTime)} at ${shift.startStation}</p>
+                    <p><strong>End:</strong> ${formatTimeWithDate(endTime)} at ${shift.stopStation}</p>
+                    <p><strong>Duration:</strong> ${Math.round(duration)} minutes (${(duration / 60).toFixed(1)} hours)</p>
+            `;
+            
+            if (shift.delays && shift.delays.length > 0) {
+                const lastDelay = shift.delays[shift.delays.length - 1];
+                const delayStart = new Date(lastDelay.startTime);
+                const delayEnd = new Date(lastDelay.endTime);
+                const delayDuration = (delayEnd - delayStart) / 60000;
+                
+                html += `
+                    <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #ddd;">
+                        <h5 style="font-size: 13px; color: #666; margin-bottom: 8px;">Last Delay:</h5>
+                        <p style="font-size: 13px; margin: 3px 0;"><strong>Reason:</strong> ${lastDelay.reason}</p>
+                        <p style="font-size: 13px; margin: 3px 0;"><strong>Duration:</strong> ${Math.round(delayDuration)} minutes</p>
+                    </div>
+                `;
+            }
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // Display full history
+        function displayHistory() {
+            const container = document.getElementById('historyContainer');
+            const noHistory = document.getElementById('noHistory');
+            
+            if (shiftHistory.length === 0) {
+                container.innerHTML = '';
+                noHistory.style.display = 'block';
+                return;
+            }
+            
+            noHistory.style.display = 'none';
+            container.innerHTML = shiftHistory.map(shift => {
+                const startTime = new Date(shift.startTime);
+                const endTime = new Date(shift.endTime);
+                const duration = (endTime - startTime) / 60000;
+                
+                let html = `
+                    <div class="shift-history-entry">
+                        <h4>${shift.name} - ${startTime.toLocaleDateString()}</h4>
+                        <p><strong>Start:</strong> ${formatTimeWithDate(startTime)} at ${shift.startStation}</p>
+                        <p><strong>End:</strong> ${formatTimeWithDate(endTime)} at ${shift.stopStation}</p>
+                        <p><strong>Duration:</strong> ${Math.round(duration)} minutes (${(duration / 60).toFixed(1)} hours)</p>
+                `;
+                
+                if (shift.delays && shift.delays.length > 0) {
+                    html += `
+                        <div class="delays-in-shift">
+                            <h5>Delays (${shift.delays.length}):</h5>
+                            ${shift.delays.map(delay => {
+                                const delayStart = new Date(delay.startTime);
+                                const delayEnd = new Date(delay.endTime);
+                                const delayDuration = (delayEnd - delayStart) / 60000;
+                                return `<p style="font-size: 13px; margin: 3px 0;">• ${delay.reason} - ${Math.round(delayDuration)} min (${formatTimeWithDate(delayStart)} to ${formatTimeWithDate(delayEnd)})</p>`;
+                            }).join('')}
+                        </div>
+                    `;
+                }
+                
+                html += '</div>';
+                return html;
+            }).join('');
+        }
+
+        // Shift Screen - Input validation
+        document.getElementById('levermanName').addEventListener('input', validateShiftStart);
+        document.getElementById('startStationNum1').addEventListener('input', validateShiftStart);
+        document.getElementById('startStationNum2').addEventListener('input', validateShiftStart);
+
+        function validateShiftStart() {
             const name = document.getElementById('levermanName').value.trim();
-            const s1 = document.getElementById('startStationNum1').value.trim();
-            const s2 = document.getElementById('startStationNum2').value.trim();
-            const station = s1 + '+' + s2;
+            const station1 = document.getElementById('startStationNum1').value.trim();
+            const station2 = document.getElementById('startStationNum2').value.trim();
+            document.getElementById('startShiftBtn').disabled = !(name && station1 && station2);
+        }
 
+        // Start Shift
+        document.getElementById('startShiftBtn').addEventListener('click', function() {
+            const name = document.getElementById('levermanName').value.trim();
+            const station1 = document.getElementById('startStationNum1').value.trim();
+            const station2 = document.getElementById('startStationNum2').value.trim();
+            const station = station1 + '+' + station2;
+            
+            const shiftStartTime = new Date().toISOString();
+            
             currentShift = {
-                id: null,
-                name,
-                startTime: new Date().toISOString(),
+                name: name,
+                startTime: shiftStartTime,
                 startStation: station,
                 delays: []
             };
-
-            await saveCurrentShift();
+            
+            // If there's an ongoing delay from previous shift, adjust its start time for reporting
+            if (currentDelay && currentDelay.reasonSaved) {
+                // Keep the original start time for duration display
+                // But mark that this shift inherited it
+                currentDelay.inheritedByShift = shiftStartTime;
+            }
+            
+            saveData();
             updateUI();
-
-            // clear form
+            
+            // Clear inputs
             document.getElementById('levermanName').value = '';
             document.getElementById('startStationNum1').value = '';
             document.getElementById('startStationNum2').value = '';
             validateShiftStart();
         });
 
-        // End shift (simplified – always ends open delay)
-        document.getElementById('endShiftBtn').addEventListener('click', async () => {
-            const s1 = document.getElementById('stopStationNum1').value.trim();
-            const s2 = document.getElementById('stopStationNum2').value.trim();
-            const stopStation = s1 + '+' + s2;
+        // Stop Station validation
+        document.getElementById('stopStationNum1').addEventListener('input', validateStopStation);
+        document.getElementById('stopStationNum2').addEventListener('input', validateStopStation);
+        
+        function validateStopStation() {
+            const station1 = document.getElementById('stopStationNum1').value.trim();
+            const station2 = document.getElementById('stopStationNum2').value.trim();
+            document.getElementById('endShiftBtn').disabled = !(station1 && station2);
+        }
 
-            const now = new Date().toISOString();
-
-            if (currentDelay?.reasonSaved) {
-                currentShift.delays.push({
-                    startTime: currentDelay.startTime,
-                    endTime: now,
-                    reason: currentDelay.reason
-                });
-                currentDelay = null;
+        // End Shift
+        document.getElementById('endShiftBtn').addEventListener('click', function() {
+            // Check if there's an ongoing delay
+            if (currentDelay && currentDelay.reasonSaved) {
+                // Show warning modal
+                document.getElementById('delayWarningModal').classList.remove('hidden');
+            } else {
+                endShiftNow(false);
             }
-
-            currentShift.endTime = now;
-            currentShift.stopStation = stopStation;
-
-            await saveCurrentShift();
-
-            // Move to history
-            shiftHistory.unshift({ ...currentShift });
-            currentShift = null;
-
-            // Auto export (your original logic)
-            autoExportShift(shiftHistory[0]);
-
-            updateUI();
-
-            document.getElementById('stopStationNum1').value = '';
-            document.getElementById('stopStationNum2').value = '';
         });
 
-        // Start / End delay – similar pattern: modify currentShift.delays → saveCurrentShift()
+        // Continue delay button (delay is ongoing)
+        document.getElementById('continueDelayBtn').addEventListener('click', function() {
+            document.getElementById('delayWarningModal').classList.add('hidden');
+            endShiftNow(true); // Keep delay active
+        });
 
-        document.getElementById('startDelayBtn').addEventListener('click', () => {
+        // End delay now button
+        document.getElementById('endDelayNowBtn').addEventListener('click', function() {
+            document.getElementById('delayWarningModal').classList.add('hidden');
+            endShiftNow(false); // End the delay
+        });
+
+        // End shift function
+        function endShiftNow(keepDelayActive) {
+            const station1 = document.getElementById('stopStationNum1').value.trim();
+            const station2 = document.getElementById('stopStationNum2').value.trim();
+            const stopStation = station1 + '+' + station2;
+            
+            const shiftEndTime = new Date().toISOString();
+            currentShift.endTime = shiftEndTime;
+            currentShift.stopStation = stopStation;
+            
+            // Handle ongoing delay
+            if (currentDelay && currentDelay.reasonSaved) {
+                if (keepDelayActive) {
+                    // Create a copy of the delay for this shift with end time as shift end time
+                    const delayForShift = {
+                        startTime: currentDelay.startTime,
+                        endTime: shiftEndTime,
+                        reason: currentDelay.reason,
+                        originalStartTime: currentDelay.startTime // Track original start
+                    };
+                    currentShift.delays.push(delayForShift);
+                    
+                    // Keep currentDelay active for next shift
+                    // Don't clear it - it will be inherited
+                } else {
+                    // End the delay now
+                    currentDelay.endTime = shiftEndTime;
+                    currentShift.delays.push(currentDelay);
+                    currentDelay = null;
+                }
+            }
+            
+            shiftHistory.unshift(currentShift);
+            
+            // Auto-export when shift ends
+            autoExportShift(currentShift);
+            
+            const tempShift = currentShift;
+            currentShift = null;
+            
+            // Only clear delay if we're not keeping it active
+            if (!keepDelayActive) {
+                currentDelay = null;
+            }
+            
+            saveData();
+            updateUI();
+            
+            document.getElementById('stopStationNum1').value = '';
+            document.getElementById('stopStationNum2').value = '';
+            
+            alert('✓ Shift ended successfully! Email draft created and CSV downloaded.');
+        }
+
+        // Start Delay
+        document.getElementById('startDelayBtn').addEventListener('click', function() {
             currentDelay = {
                 startTime: new Date().toISOString(),
                 reason: null,
                 reasonSaved: false
             };
+            
             updateUI();
         });
 
-        // ... rest of delay reason / save / end logic – call saveCurrentShift() after changes ...
+        // Reason buttons
+        document.querySelectorAll('.btn-reason').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.btn-reason').forEach(btn => btn.classList.remove('selected'));
+                this.classList.add('selected');
+                currentDelay.reason = this.dataset.reason;
+                
+                if (currentDelay.reason === 'Other') {
+                    document.getElementById('customReasonSection').classList.remove('hidden');
+                } else {
+                    document.getElementById('customReasonSection').classList.add('hidden');
+                    document.getElementById('customReason').value = '';
+                }
+                
+                // Show Save Reason button
+                document.getElementById('saveReasonBtn').classList.remove('hidden');
+            });
+        });
 
-        // Keep your auto-save indicator, showScreen, etc.
+        // Save Reason button
+        document.getElementById('saveReasonBtn').addEventListener('click', function() {
+            // If "Other" was selected, use the custom text
+            if (currentDelay.reason === 'Other') {
+                const customText = document.getElementById('customReason').value.trim();
+                if (!customText) {
+                    alert('Please enter a custom reason.');
+                    return;
+                }
+                currentDelay.reason = customText;
+            }
+            
+            currentDelay.reasonSaved = true;
+            saveData();
+            updateUI();
+        });
 
-        // Kick off
-        init().catch(console.error);
+        // End Delay
+        document.getElementById('endDelayBtn').addEventListener('click', function() {
+            const delayEndTime = new Date().toISOString();
+            
+            // If delay was inherited, use shift start time for this shift's report
+            const delayForReport = {
+                startTime: currentDelay.inheritedByShift || currentDelay.startTime,
+                endTime: delayEndTime,
+                reason: currentDelay.reason,
+                originalStartTime: currentDelay.startTime // Keep track of true start
+            };
+            
+            currentShift.delays.push(delayForReport);
+            currentDelay = null;
+            
+            saveData();
+            
+            // Reset reason selection
+            document.querySelectorAll('.btn-reason').forEach(btn => btn.classList.remove('selected'));
+            document.getElementById('customReasonSection').classList.add('hidden');
+            document.getElementById('customReason').value = '';
+            document.getElementById('saveReasonBtn').classList.add('hidden');
+            
+            // Show success message
+            document.getElementById('delaySuccessMsg').classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('delaySuccessMsg').classList.add('hidden');
+            }, 3000);
+            
+            updateUI();
+        });
+
+        // Auto-export when shift ends
+        function autoExportShift(shift) {
+            // Generate email
+            const emailBody = generateSingleShiftEmailReport(shift);
+            const startTime = new Date(shift.startTime);
+            const subject = `Leverman Log - ${shift.name} - ${startTime.toLocaleDateString()}`;
+            
+            // Create mailto link (this will open as draft in mail app)
+            const mailtoLink = `mailto:hsedirector@mwdredging.com,brian@kennedymail.net?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+            
+            // Open email as draft
+            window.location.href = mailtoLink;
+            
+            // Also download CSV automatically
+            setTimeout(() => {
+                const csv = generateSingleShiftCSV(shift);
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                const date = new Date(shift.startTime).toISOString().split('T')[0];
+                a.download = `shift-${shift.name.replace(/\s+/g, '-')}-${date}.csv`;
+                a.click();
+                window.URL.revokeObjectURL(url);
+            }, 1000); // Small delay to let email open first
+        }
+
+        // Generate email report for single shift
+        function generateSingleShiftEmailReport(shift) {
+            const startTime = new Date(shift.startTime);
+            const endTime = new Date(shift.endTime);
+            const duration = (endTime - startTime) / 60000; // minutes
+
+            let report = 'LEVERMAN SHIFT REPORT\n';
+            report += '='.repeat(50) + '\n\n';
+            report += `Leverman: ${shift.name}\n`;
+            report += `Date: ${startTime.toLocaleDateString()}\n`;
+            report += `Start: ${formatTimeWithDate(startTime)} at Station ${shift.startStation}\n`;
+            report += `End: ${formatTimeWithDate(endTime)} at Station ${shift.stopStation}\n`;
+            report += `Duration: ${(duration / 60).toFixed(1)} hours\n`;
+
+            if (shift.delays && shift.delays.length > 0) {
+                report += `\nDELAYS (${shift.delays.length}):\n`;
+                shift.delays.forEach((delay, delayIndex) => {
+                    const delayStart = new Date(delay.startTime);
+                    const delayEnd = new Date(delay.endTime);
+                    const delayDuration = (delayEnd - delayStart) / 60000;
+                    
+                    report += `  ${delayIndex + 1}. ${delay.reason}\n`;
+                    report += `     Start: ${formatTimeWithDate(delayStart)}\n`;
+                    report += `     End: ${formatTimeWithDate(delayEnd)}\n`;
+                    report += `     Duration: ${Math.round(delayDuration)} minutes\n`;
+                    
+                    // Note if delay was inherited
+                    if (delay.originalStartTime && delay.originalStartTime !== delay.startTime) {
+                        report += `     (Note: Delay started in previous shift at ${formatTimeWithDate(new Date(delay.originalStartTime))})\n`;
+                    }
+                });
+                
+                const totalDelayTime = shift.delays.reduce((sum, delay) => {
+                    return sum + (new Date(delay.endTime) - new Date(delay.startTime));
+                }, 0) / 60000;
+                report += `\n  Total Delay Time: ${Math.round(totalDelayTime)} minutes\n`;
+            } else {
+                report += `\nNo delays recorded.\n`;
+            }
+
+            report += '\n' + '='.repeat(50) + '\n';
+            return report;
+        }
+
+        // Generate CSV for single shift
+        function generateSingleShiftCSV(shift) {
+            let csv = 'Shift Date,Leverman,Start Time,End Time,Start Station,Stop Station,Duration (hours),Delay Count,Total Delay (minutes),Delay Reason,Delay Start,Delay End,Delay Duration (minutes),Notes\n';
+
+            const startTime = new Date(shift.startTime);
+            const endTime = new Date(shift.endTime);
+            const duration = ((endTime - startTime) / 60000 / 60).toFixed(2);
+            const date = startTime.toLocaleDateString();
+
+            if (shift.delays && shift.delays.length > 0) {
+                const totalDelayTime = shift.delays.reduce((sum, delay) => {
+                    return sum + (new Date(delay.endTime) - new Date(delay.startTime));
+                }, 0) / 60000;
+
+                shift.delays.forEach(delay => {
+                    const delayStart = new Date(delay.startTime);
+                    const delayEnd = new Date(delay.endTime);
+                    const delayDuration = Math.round((delayEnd - delayStart) / 60000);
+                    
+                    const notes = delay.originalStartTime && delay.originalStartTime !== delay.startTime 
+                        ? `Inherited from previous shift (started ${formatTimeWithDate(new Date(delay.originalStartTime))})`
+                        : '';
+
+                    csv += `"${date}","${shift.name}","${formatTimeWithDate(startTime)}","${formatTimeWithDate(endTime)}","${shift.startStation}","${shift.stopStation}",${duration},${shift.delays.length},${Math.round(totalDelayTime)},"${delay.reason}","${formatTimeWithDate(delayStart)}","${formatTimeWithDate(delayEnd)}",${delayDuration},"${notes}"\n`;
+                });
+            } else {
+                csv += `"${date}","${shift.name}","${formatTimeWithDate(startTime)}","${formatTimeWithDate(endTime)}","${shift.startStation}","${shift.stopStation}",${duration},0,0,"","","",0,""\n`;
+            }
+
+            return csv;
+        }
+
+        // Show auto-save indicator
+        function showAutoSave() {
+            const indicator = document.getElementById('autoSaveIndicator');
+            indicator.classList.add('show');
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+        }
+
+        // Enhanced save with auto-save indicator
+        const originalSaveData = saveData;
+        saveData = function() {
+            originalSaveData();
+            showAutoSave();
+        };
+
+        // Auto-save every 30 seconds (redundant safety)
+        setInterval(() => {
+            if (currentShift || shiftHistory.length > 0) {
+                saveData();
+            }
+        }, 30000);
     </script>
 </body>
 </html>
