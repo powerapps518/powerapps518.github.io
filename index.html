@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Leverman Logger</title>
     <style>
         * {
@@ -341,6 +341,150 @@
             color: #666;
             margin-bottom: 8px;
         }
+
+        /* Mobile responsive styles */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        button {
+            touch-action: manipulation;
+        }
+
+        body,
+        .container {
+            overflow-x: hidden;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 10px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+                margin-bottom: 5px;
+            }
+
+            .header p {
+                font-size: 12px;
+            }
+
+            .tab {
+                font-size: 13px;
+                padding: 12px 6px;
+            }
+
+            .screen {
+                padding: 15px 12px;
+            }
+
+            .form-section {
+                margin-bottom: 18px;
+            }
+
+            label {
+                font-size: 13px;
+            }
+
+            input[type="text"],
+            input[type="number"],
+            textarea {
+                padding: 13px 10px;
+                font-size: 16px;
+            }
+
+            button {
+                font-size: 15px;
+                padding: 15px 18px;
+            }
+
+            .btn-primary {
+                font-size: 16px;
+                padding: 16px;
+            }
+
+            .btn-start,
+            .btn-end {
+                font-size: 17px;
+                padding: 17px;
+                margin: 12px 0;
+            }
+
+            .btn-reason {
+                font-size: 14px;
+                padding: 14px 16px;
+            }
+
+            .status-box,
+            .current-delay-box,
+            .alert,
+            .shift-history-entry {
+                padding: 14px;
+                margin: 12px 0;
+            }
+
+            .status-box h3,
+            .current-delay-box h3 {
+                font-size: 16px;
+            }
+
+            .status-box p,
+            .current-delay-box p,
+            .shift-history-entry p {
+                font-size: 13px;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+
+            .shift-history-entry h4 {
+                font-size: 15px;
+            }
+
+            .auto-save-indicator {
+                font-size: 11px;
+                padding: 6px 12px;
+                top: 8px;
+                right: 8px;
+            }
+        }
+
+        @media (max-width: 375px) {
+            .header h1 {
+                font-size: 18px;
+            }
+
+            .header p {
+                font-size: 11px;
+            }
+
+            .tab {
+                font-size: 12px;
+                padding: 10px 4px;
+            }
+
+            .screen {
+                padding: 12px 10px;
+            }
+
+            input[type="text"],
+            input[type="number"],
+            textarea {
+                padding: 12px 8px;
+            }
+
+            .btn-reason {
+                font-size: 13px;
+                padding: 13px 14px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -369,10 +513,10 @@
 
                 <div class="form-section">
                     <label>Start Station</label>
-                    <div style="display: flex; align-items: center; gap: 10px; width: 100%;">
-                        <input type="number" id="startStationNum1" placeholder="1238" style="flex: 1; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;" min="0">
-                        <span style="font-size: 24px; font-weight: bold; color: #333;">+</span>
-                        <input type="number" id="startStationNum2" placeholder="10" style="flex: 1; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;" min="0">
+                    <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
+                        <input type="number" id="startStationNum1" placeholder="1238" style="flex: 1; min-width: 0; padding: 12px 8px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;" min="0">
+                        <span style="font-size: 20px; font-weight: bold; color: #333; flex-shrink: 0;">+</span>
+                        <input type="number" id="startStationNum2" placeholder="10" style="flex: 1; min-width: 0; padding: 12px 8px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;" min="0">
                     </div>
                 </div>
 
@@ -390,10 +534,10 @@
 
                 <div class="form-section">
                     <label>Stop Station</label>
-                    <div style="display: flex; align-items: center; gap: 10px; width: 100%;">
-                        <input type="number" id="stopStationNum1" placeholder="950" style="flex: 1; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;" min="0">
-                        <span style="font-size: 24px; font-weight: bold; color: #333;">+</span>
-                        <input type="number" id="stopStationNum2" placeholder="33" style="flex: 1; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;" min="0">
+                    <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
+                        <input type="number" id="stopStationNum1" placeholder="950" style="flex: 1; min-width: 0; padding: 12px 8px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;" min="0">
+                        <span style="font-size: 20px; font-weight: bold; color: #333; flex-shrink: 0;">+</span>
+                        <input type="number" id="stopStationNum2" placeholder="33" style="flex: 1; min-width: 0; padding: 12px 8px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;" min="0">
                     </div>
                 </div>
 
@@ -469,10 +613,10 @@
         </div>
 
         <!-- Delay Warning Modal -->
-        <div id="delayWarningModal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; display: flex; align-items: center; justify-content: center;">
-            <div style="background: white; padding: 30px; border-radius: 12px; max-width: 500px; margin: 20px;">
-                <h3 style="color: #f44336; margin-bottom: 15px;">⚠️ Active Delay Warning</h3>
-                <p style="margin-bottom: 20px; color: #555;">You have an ongoing delay. What would you like to do?</p>
+        <div id="delayWarningModal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px;">
+            <div style="background: white; padding: 25px; border-radius: 12px; max-width: 500px; width: 100%;">
+                <h3 style="color: #f44336; margin-bottom: 15px; font-size: 18px;">⚠️ Active Delay Warning</h3>
+                <p style="margin-bottom: 20px; color: #555; font-size: 14px;">You have an ongoing delay. What would you like to do?</p>
                 <button class="btn-primary" id="continueDelayBtn" style="margin-bottom: 10px; background: #ff9800;">DELAY IS ONGOING</button>
                 <button class="btn-primary" id="endDelayNowBtn" style="background: #f44336;">I WANT TO END THE DELAY</button>
             </div>
