@@ -1104,10 +1104,10 @@
             // Generate email
             const emailBody = generateSingleShiftEmailReport(shift);
             const startTime = new Date(shift.startTime);
-            const subject = `Shift Report - ${shift.name} - ${startTime.toLocaleDateString()}`;
+            const subject = `Leverman Log - ${shift.name} - ${startTime.toLocaleDateString()}`;
             
             // Create mailto link (this will open as draft in mail app)
-            const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+            const mailtoLink = `mailto:hsedirector@mwdredging.com,brian@kennedymail.net?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
             
             // Open email as draft
             window.location.href = mailtoLink;
